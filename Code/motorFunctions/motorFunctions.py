@@ -93,12 +93,37 @@ class ECEGMotor():
             #Move the arm CCW
             if(steps_to_take < 0):
                 self.__stepper.onestep(direction = stepper.BACKWARD, style = stepper.DOUBLE)
-                self.__current_step -= 1
+                self.__current_step -= 2
 
             #Move the arm CW
             else:
                 self.__stepper.onestep(style = stepper.DOUBLE)
-                self.__current_step += 1
+                
+    def set_position_steps(self, pos):
+        """
+        Takes in the position in steps from home and then moves the arm to that location
+
+        Params: The position in steps that you want the arm to go to, could be int or float. It will do nothing if its not between 0 and STEPS_FOR_FULL(For now 4096)
+        """
+
+        if(pos < 0 or pos > ECEGMotor.STEPS_FOR_FULL):
+            print("Input not between 0 and", ECEGMotor.STEPS_FOR_FULL, "the motor will not be moved")
+            return
+        
+        
+        steps_to_take =  pos - self.__current_step
+
+        for i in range(abs(steps_to_take)):
+
+            #Move the arm CCW
+            if(steps_to_take < 0):
+                self.__stepper.onestep(direction = stepper.BACKWARD, style = stepper.DOUBLE)
+                self.__current_step -= 2
+
+            #Move the arm CW
+            else:
+                self.__stepper.onestep(style = stepper.DOUBLE)
+                self.__current_step += 2
 
     def reset_position(self):
         """
@@ -121,14 +146,14 @@ class ECEGMotor():
                     return
                 
                 self.__stepper.onestep(direction = stepper.BACKWARD,style = stepper.DOUBLE)
-                self.__current_step -= 1
+                self.__current_step -= 2
                 
             else:
-                if(self.current_step == 4096):
+                if(self.current_step == ECEGMotor.STEPS_FOR_FULL):
                     return
                 
                 self.__stepper.onestep(style = stepper.DOUBLE)
-                self.__current_step += 1
+                self.__current_step += 2
 
 ##EXAMPLES
 '''
