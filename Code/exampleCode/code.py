@@ -39,6 +39,12 @@ import board
 import time
 
 
+# Get wifi details and more from a secrets.py file
+try:
+    from secrets import secrets
+except ImportError:
+    print("WiFi secrets are kept in secrets.py, please add them there!")
+    raise
 
 #-----------------
 
@@ -46,10 +52,10 @@ import time
 #Change these for your purposes
 
 #Wifi and Thingspeak stuff
-NETWORK_NAME = "JamesDesktop"
-NETWORK_PASS = "Gemima12"
+NETWORK_NAME = secrets["ssid"]
+NETWORK_PASS = secrets["password"]
 THINGSPEAK_CHANNEL = 1221440
-THINGSPEAK_API_KEY = 'TPQROJW5N4FYQDQB'
+THINGSPEAK_API_KEY = secrets['thingspeak_API_token']
 I2C = board.I2C()
 
 
