@@ -88,6 +88,9 @@ class ECEGMotor():
         
         steps_to_take =  goal_pos_in_steps - self.__current_step
 
+        #Divides it by two since we are using the double step type
+        steps_to_take = steps_to_take//2
+        
         for i in range(abs(steps_to_take)):
 
             #Move the arm CCW
@@ -113,6 +116,9 @@ class ECEGMotor():
         
         steps_to_take =  pos - self.__current_step
 
+        #Divides it by two since we are using the double step type
+        steps_to_take = steps_to_take//2
+        
         for i in range(abs(steps_to_take)):
 
             #Move the arm CCW
@@ -139,6 +145,10 @@ class ECEGMotor():
         """
         Moves the arm amount steps, if amount is negative then the arm is moved CCW and if its positive it moves CW
         """
+        
+        #Divides it by two since we are using the double step type
+        amount = amount//2
+        
         for i in range(abs(amount)):
             
             if(amount < 0):
