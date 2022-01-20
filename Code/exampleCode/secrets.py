@@ -4,5 +4,5 @@
 secrets = {
     'ssid' : 'Wifi Name',
     'password' : 'Wifi Password',
-    'thingspeak_API_token' : Example
+    'thingspeak_API_token' : 'Example'
     }
