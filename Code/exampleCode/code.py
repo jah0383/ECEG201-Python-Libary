@@ -39,6 +39,7 @@ import board
 import time
 
 
+
 # Get wifi details and more from a secrets.py file
 try:
     from secrets import secrets
@@ -68,12 +69,16 @@ DEBUG = True
 
 
 #The min and max tempature you should expect in the Maker-E
-TEMP_MIN = 40
-TEMP_MAX = 90
+TEMP_MIN = 50
+TEMP_MAX = 70
 TEMP_RANGE = [TEMP_MIN,TEMP_MAX]
 
 #The delay between each time it pulls from the thingspeak server and gets new data, in seconds
 UPDATE_PERIOD = 40 * 60
+
+#This is the maximum angle I want for the motor here
+#This will be the angle the motor is set to when we have 100% humidity 
+MAX_MOTOR_DEGREE = 306
 
 
 #-----------------
@@ -96,8 +101,9 @@ net_tool = espFun.ESP_Tools(NETWORK_NAME, NETWORK_PASS, THINGSPEAK_CHANNEL, THIN
 
 
 #'motor_tool' handles all the motor related functions
-#Calling this will automaticly make the motor try and find its home(i.e. try to make a full rotation and end up hitting the stop)
 motor_tool = motorFun.ECEGMotor(I2C,DEBUG)
+#Calling this will automaticly make the motor try and find its home(i.e. try to make a full rotation and end up hitting the stop peg)
+motor_tool.find_home()
 
 #Flash the neoPixel to indicate that startup it done
 
@@ -144,7 +150,7 @@ def basic_loop():
     #In this case we are taking the tempature in the makerE which we assume will be within TEMP_RANGE
     #   and mapping it onto the new range of 0 to 255, the min and max values of a LED RBG value
     mapped_color = neoFun.maprange(TEMP_RANGE, [0,255], current_makerE_temp)
-    print(mapped_color)
+
 
     #This is setting the value of the Neopixel Ring, its
     #the values are RedGreenBlue, with each going from 0-255
@@ -162,8 +168,8 @@ def basic_loop():
 
     #The motor function takes in a degree(math not tempature) and moves the motor to that degree
     #So we need to convert the humidty which is given as a percentage, into a degree
-    #You could also use the maprange function for this
-    humd_as_a_degree = ((current_makerE_humd/100)*360)
+    #You could also use the maprange function for this but the values are pretty simple
+    humd_as_a_degree = ((current_makerE_humd/100)*MAX_MOTOR_DEGREE)
 
     #Simply sets the motor arm to the position calculated before
     motor_tool.set_position_degrees(humd_as_a_degree)
@@ -173,7 +179,7 @@ def basic_loop():
 
 #This is another thing that you could do, and I'm just doing this to show off more of the functions so you know whats available to you
 #This loop shows how the tempature changes throughout the day by assigning each led an hour of the day
-#The humidty sensing stays the same
+#The humidity sensing stays the same
 def complex_loop():
 
     #This will hold all the values given to us from net_tool.pull_from_field()
@@ -234,6 +240,20 @@ def complex_loop():
     #This sets the first pixel to green, to indicate the start of the day, or the point between the oldest measurment
     #   and the newest
     neoFun.set_pixel((0,255,0),0)
+
+    #All of this is the same as in basic_loop()
+    current_makerE_humd = float(net_tool.pull_from_field(2)[0])
+
+    if(DEBUG):
+        print("Got Humidity. hum =", current_makerE_humd)
+
+    #The motor function takes in a degree(math not tempature) and moves the motor to that degree
+    #So we need to convert the humidty which is given as a percentage, into a degree
+    #You could also use the maprange function for this but the values are pretty simple
+    humd_as_a_degree = ((current_makerE_humd/100)*MAX_MOTOR_DEGREE)
+
+    #Simply sets the motor arm to the position calculated before
+    motor_tool.set_position_degrees(humd_as_a_degree)
 
 
 while(True):

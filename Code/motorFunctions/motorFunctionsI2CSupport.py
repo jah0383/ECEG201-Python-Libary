@@ -49,17 +49,16 @@ class ECEGMotor():
         self.__debug = debug
         self.__kit = MotorKit(i2c = i2c)
         self.__stepper = self.__kit.stepper1
-        self.__find_home()
         self.__current_step = 0 #the current number of steps CW from home(step 0)
 
 
-    def __find_home(self):
+    def find_home(self):
         """
-        A private method for finding the peg on the device, just moves it CCW 1 full rotation
+        A method for finding the peg on the device, just moves it CCW 1 full rotation
         """
         if self.__debug:
             print("Finding the home of the stepper moter")
-        for i in range(ECEGMotor.STEPS_FOR_FULL):
+        for i in range(ECEGMotor.STEPS_FOR_FULL//2):
            self.__stepper.onestep(direction = stepper.BACKWARD, style = stepper.DOUBLE)
         if self.__debug:
             print("Home found\n")
@@ -99,7 +98,7 @@ class ECEGMotor():
             print("Input not between 0 and 360, the motor will not be moved")
             return
         
-        goal_pos_in_steps = int(((pos/360) * ECEGMotor.STEPS_FOR_FULL)/2)
+        goal_pos_in_steps = int(((pos/360) * ECEGMotor.STEPS_FOR_FULL))
         
         steps_to_take =  goal_pos_in_steps - self.__current_step
 
